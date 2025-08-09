@@ -6,6 +6,8 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  backend "gcs" {} # <-- Needed for Terragrunt remote_state
 }
 
 resource "google_compute_network" "vpc" {
