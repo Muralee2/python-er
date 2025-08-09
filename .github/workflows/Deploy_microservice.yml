@@ -1,0 +1,45 @@
+name: Deploy Microservice
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+      GOOGLE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+      GOOGLE_REGION: us-central1
+      CLUSTER_NAME: gke-dev-cluster
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      # (Rest of steps stay the same)
+
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        run: |
+          echo "${GOOGLE_CREDENTIALS}" > $HOME/gcp-key.json
+          gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
+          gcloud config set project $GOOGLE_PROJECT
+          gcloud config set compute/region $GOOGLE_REGION
+          gcloud container clusters get-credentials $CLUSTER_NAME --region $GOOGLE_REGION
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.13.0
+
+      - name: Deploy Helm Chart
+        run: |
+          helm upgrade --install microservice ./helm/microservice \
+            --namespace default \
+            --create-namespace \
+            --set image.repository=python \
+            --set image.tag=3.11 \
+            --set service.port=80
