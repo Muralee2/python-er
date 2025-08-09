@@ -15,12 +15,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      # (Rest of steps stay the same)
-
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -50,3 +44,4 @@ jobs:
       - name: Terragrunt Apply
         if: github.ref == 'refs/heads/main'
         run: terragrunt run-all apply --terragrunt-non-interactive --terragrunt-working-dir live/dev
+
