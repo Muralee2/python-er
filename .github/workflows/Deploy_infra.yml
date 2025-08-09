@@ -1,10 +1,7 @@
 name: Terraform CI with Terragrunt
 
 on:
-  workflow_dispatch: # Manual trigger
-  push:
-    branches:
-      - main
+  workflow_dispatch: # Manual trigger only
 
 jobs:
   terraform:
@@ -35,19 +32,22 @@ jobs:
         run: |
           echo "${GOOGLE_CREDENTIALS}" > $HOME/gcp-key.json
           gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
-          gcloud auth application-default login --quiet --key-file=$HOME/gcp-key.json
           gcloud config set project $GOOGLE_PROJECT
           gcloud config set compute/region $GOOGLE_REGION
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
 
       - name: Terragrunt Init
-        run: terragrunt init --all --non-interactive --working-dir=live/dev
+        run: terragrunt run-all init \
+          --terragrunt-non-interactive \
+          --terragrunt-working-dir live/dev
 
       - name: Terragrunt Plan
-        run: terragrunt plan --all --non-interactive --working-dir=live/dev
+        run: terragrunt run-all plan \
+          --terragrunt-non-interactive \
+          --terragrunt-working-dir live/dev
 
-      - name: Terragrunt Apply
+      - name: Terragrunt Apply (Only on Main Branch)
         if: github.ref == 'refs/heads/main'
-        run: terragrunt apply --all --non-interactive --working-dir=live/dev
+        run: terragrunt run-all apply \
+          --terragrunt-non-interactive \
+          --terragrunt-working-dir live/dev
 
