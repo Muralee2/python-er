@@ -1,7 +1,10 @@
 name: Terraform CI with Terragrunt
 
 on:
-  workflow_dispatch: # Manual trigger only
+  workflow_dispatch: # Manual trigger
+  push:
+    branches:
+      - main
 
 jobs:
   terraform:
@@ -23,26 +26,28 @@ jobs:
 
       - name: Install Terragrunt
         run: |
-         TG_VERSION="0.84.1"
-         wget https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64
-         sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
-         sudo chmod +x /usr/local/bin/terragrunt
-
+          TG_VERSION="0.84.1"
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64
+          sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
+          sudo chmod +x /usr/local/bin/terragrunt
 
       - name: Authenticate to GCP
         run: |
           echo "${GOOGLE_CREDENTIALS}" > $HOME/gcp-key.json
           gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
+          gcloud auth application-default login --quiet --key-file=$HOME/gcp-key.json
           gcloud config set project $GOOGLE_PROJECT
           gcloud config set compute/region $GOOGLE_REGION
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
 
       - name: Terragrunt Init
-        run: terragrunt run-all init --terragrunt-non-interactive --terragrunt-working-dir live/dev
+        run: terragrunt init --all --non-interactive --working-dir=live/dev
 
       - name: Terragrunt Plan
-        run: terragrunt run-all plan --terragrunt-non-interactive --terragrunt-working-dir live/dev
+        run: terragrunt plan --all --non-interactive --working-dir=live/dev
 
       - name: Terragrunt Apply
         if: github.ref == 'refs/heads/main'
-        run: terragrunt run-all apply --terragrunt-non-interactive --terragrunt-working-dir live/dev
+        run: terragrunt apply --all --non-interactive --working-dir=live/dev
 
