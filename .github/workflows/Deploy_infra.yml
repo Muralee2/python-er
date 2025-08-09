@@ -1,0 +1,50 @@
+name: Terraform CI with Terragrunt
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    name: Terragrunt Deploy
+    runs-on: ubuntu-latest
+
+    env:
+      GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+      GOOGLE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+      GOOGLE_REGION: us-central1
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Install Terragrunt
+        run: |
+          TG_VERSION="0.64.6"
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64
+          sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
+          sudo chmod +x /usr/local/bin/terragrunt
+
+      - name: Authenticate to GCP
+        run: |
+          echo "${GOOGLE_CREDENTIALS}" > $HOME/gcp-key.json
+          gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
+          gcloud config set project $GOOGLE_PROJECT
+          gcloud config set compute/region $GOOGLE_REGION
+
+      - name: Terragrunt Init
+        run: terragrunt run-all init --terragrunt-non-interactive --terragrunt-working-dir live/dev
+
+      - name: Terragrunt Plan
+        run: terragrunt run-all plan --terragrunt-non-interactive --terragrunt-working-dir live/dev
+
+      - name: Terragrunt Apply
+        if: github.ref == 'refs/heads/main'
+        run: terragrunt run-all apply --terragrunt-non-interactive --terragrunt-working-dir live/dev
