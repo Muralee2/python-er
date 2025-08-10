@@ -15,15 +15,18 @@ inputs = {
 }
 
 # Remote state (GCS)
+
 remote_state {
   backend = "gcs"
   config = {
-    bucket         = "samurai-og1"
-    prefix         = "terraform/state"
-    project        = local.project_id
-    location       = "US"
-    encryption_key = null
+    bucket   = "samurai-og1"
+    prefix   = "${path_relative_to_include()}"
+    project  = local.project_id
+    location = "US"
+    # encryption_key removed to avoid <nil> error
   }
+}
+
 }
 
 generate "backend" {
