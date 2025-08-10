@@ -1,7 +1,7 @@
-name: Terragrunt Destroy from GCS State
+name: Terragrunt Destroy with Ordered Dependencies
 
 on:
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch:
 
 jobs:
   terragrunt-destroy:
@@ -10,32 +10,26 @@ jobs:
       GOOGLE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
       GOOGLE_REGION: ${{ secrets.GCP_REGION }}
       GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
-      BUCKET_NAME: samurai-og1-bucket
 
     steps:
-      # 1. Checkout repo
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 2. Authenticate to Google Cloud
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # 3. Set gcloud project & region
-      - name: Set gcloud project & region
+      - name: Set gcloud project and region
         run: |
           gcloud config set project $GOOGLE_PROJECT
           gcloud config set compute/region $GOOGLE_REGION
 
-      # 4. Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
 
-      # 5. Install Terragrunt
       - name: Install Terragrunt
         run: |
           TG_VERSION="0.84.1"
@@ -43,32 +37,17 @@ jobs:
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           sudo chmod +x /usr/local/bin/terragrunt
 
-      # 6. Check GCS for state files of modules to destroy (exclude gke-cluster)
-      - name: Check if network and firewall state files exist
-        id: check_state
+      - name: Destroy firewall module first
         run: |
-          modules=("network" "firewall")
-          missing=0
-          for module in "${modules[@]}"; do
-            echo "Checking $module state..."
-            if ! gsutil ls gs://$BUCKET_NAME/$module/terraform.tfstate >/dev/null 2>&1; then
-              echo "❌ No state found for $module"
-              missing=1
-            else
-              echo "✅ State found for $module"
-            fi
-          done
-          if [ "$missing" -eq 1 ]; then
-            echo "Some state files missing. Skipping destroy."
-            exit 0
-          fi
+          cd live/dev/firewall
+          terragrunt destroy -auto-approve
 
-      # 7. Destroy only network and firewall modules
-      - name: Destroy network and firewall modules only
+      - name: Destroy network module second
         run: |
-          cd live/dev
-          echo "Destroying network module..."
-          terragrunt destroy --auto-approve --non-interactive --working-dir=network
-          echo "Destroying firewall module..."
-          terragrunt destroy --auto-approve --non-interactive --working-dir=firewall
+          cd ../network
+          terragrunt destroy -auto-approve
 
+      - name: Destroy GKE cluster last (optional)
+        run: |
+          cd ../gke-cluster
+          terragrunt destroy -auto-approve
