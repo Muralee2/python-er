@@ -1,40 +1,40 @@
-name: Terragrunt Destroy
+name: Terraform Destroy with Terragrunt
 
 on:
   workflow_dispatch: # Manual trigger only
 
 jobs:
-  terragrunt-destroy:
-    name: Destroy All Resources
+  terraform-destroy:
+    name: Terragrunt Destroy
     runs-on: ubuntu-latest
     env:
       GOOGLE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
       GOOGLE_REGION: ${{ secrets.GCP_REGION }}
-      GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
     steps:
-      # 1. Checkout repo
-      - name: Checkout repository
+      # Checkout the repository to get the latest Terraform/Terragrunt configuration
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 2. Authenticate to Google Cloud
+      # Authenticate to Google Cloud using service account credentials
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Set gcloud project & region
+      # Set the Google Cloud project and region
+      - name: Set gcloud project and region
         run: |
           gcloud config set project $GOOGLE_PROJECT
           gcloud config set compute/region $GOOGLE_REGION
 
-      # 3. Install Terraform
-      - name: Setup Terraform
+      # Install Terraform
+      - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
 
-      # 4. Install Terragrunt
+      # Install Terragrunt
       - name: Install Terragrunt
         run: |
           TG_VERSION="0.84.1"
@@ -42,11 +42,76 @@ jobs:
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           sudo chmod +x /usr/local/bin/terragrunt
 
-      # 5. Terragrunt Destroy
-      - name: Destroy all Terragrunt modules
+     # Destroy GKE cluster resources
+   #   - name: Terragrunt Destroy GKE cluster
+  #      run: terragrunt destroy --auto-approve --non-interactive --working-dir=live/dev/gke-cluster
+
+   #   # Wait for GKE cluster deletion
+   #   - name: Wait for GKE cluster deletion
+     #   run: |
+    #      RETRIES=20
+    #      while gcloud container clusters describe gke-cluster --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT &> /dev/null; do
+     #       echo "Waiting for GKE cluster to be deleted..."
+       #     sleep 15
+      #      RETRIES=$((RETRIES-1))
+     #       if [ $RETRIES -eq 0 ]; then
+     #         echo "GKE cluster deletion timeout"
+     #         exit 1
+     #       fi
+     #     done
+
+           # Destroy firewall resources
+      - name: Terragrunt Destroy Firewall
+        run: terragrunt destroy --auto-approve --non-interactive --working-dir=live/dev/firewall
+
+      # Force delete any remaining firewall rules before waiting
+      - name: Force delete leftover firewall rules
         run: |
-          cd live/dev
-          terragrunt destroy --all \
-            --auto-approve \
-            --non-interactive \
-            --working-dir=.
+          RULES=$(gcloud compute firewall-rules list --filter="network=dev-vpc" --format="value(name)" --project=$GOOGLE_PROJECT)
+          if [ -n "$RULES" ]; then
+            echo "Force deleting leftover firewall rules..."
+            for rule in $RULES; do
+              gcloud compute firewall-rules delete "$rule" --quiet --project=$GOOGLE_PROJECT || true
+            done
+          else
+            echo "No leftover firewall rules found."
+          fi
+
+      # Wait for firewall rules deletion
+      - name: Wait for firewall rules deletion
+        run: |
+          RETRIES=20
+          while gcloud compute firewall-rules list --filter="network=dev-vpc" --project=$GOOGLE_PROJECT | grep -q dev-vpc; do
+            echo "Waiting for firewall rules to be deleted..."
+            sleep 15
+            RETRIES=$((RETRIES-1))
+            if [ $RETRIES -eq 0 ]; then
+              echo "Firewall rules deletion timeout"
+              exit 1
+            fi
+          done
+
+           # Force delete resources that block subnet deletion
+           # Force delete resources that block subnet deletion
+      - name: Force cleanup subnet dependencies
+        run: |
+          echo "Checking for resources in dev-subnet..."
+          
+          # Delete any static IPs in the subnet
+          IPS=$(gcloud compute addresses list --filter="subnetwork:(dev-subnet) region:($GOOGLE_REGION)" --format="value(name)" --project=$GOOGLE_PROJECT)
+          for ip in $IPS; do
+            gcloud compute addresses delete "$ip" --quiet --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT || true
+          done
+          
+          # Delete forwarding rules in the subnet
+          RULES=$(gcloud compute forwarding-rules list --filter="subnetwork:(dev-subnet) region:($GOOGLE_REGION)" --format="value(name)" --project=$GOOGLE_PROJECT)
+          for rule in $RULES; do
+            gcloud compute forwarding-rules delete "$rule" --quiet --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT || true
+          done
+          
+          # Delete routers (Cloud NAT)
+          ROUTERS=$(gcloud compute routers list --filter="network:dev-vpc region:($GOOGLE_REGION)" --format="value(name)" --project=$GOOGLE_PROJECT)
+          for router in $ROUTERS; do
+            gcloud compute routers delete "$router" --quiet --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT || true
+          done
+
