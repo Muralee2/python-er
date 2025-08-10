@@ -25,11 +25,3 @@ remote_state {
     encryption_key = null
   }
 }
-
-# Provider
-terraform {
-  extra_arguments "provider_config" {
-    commands = get_terraform_commands_that_need_vars()
-    optional_var_files = []
-  }
-}
