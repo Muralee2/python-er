@@ -8,7 +8,7 @@ include {
 
 inputs = {
   project_id              = include.inputs.project_id
-  network_name            = include.network_name
+  network_name            = include.inputs.network_name
   auto_create_subnetworks = false
 
   subnets = [
