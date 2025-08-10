@@ -7,6 +7,6 @@ include {
 }
 
 inputs = {
-  project_id = local.project_id
-  region     = local.region
+  project_id = able-armor-468408-v6
+  region     = us-central1
 }
