@@ -1,7 +1,7 @@
 resource "google_container_cluster" "gke" {
   name     = var.cluster_name
   location = var.region
-
+  deletion_protection = false
   # Just the names instead of full URLs
   network    = var.network_name
   subnetwork = var.subnet_name
