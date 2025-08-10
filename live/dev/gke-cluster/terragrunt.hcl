@@ -1,29 +1,38 @@
 terraform {
-  source = "https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/private-cluster?ref=v29.0.0"
+  source = "https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/private-cluster?ref=v31.0.0"
 }
 
 include {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("root.hcl")
+}
+
+dependencies {
+  paths = ["../network", "../firewall"]
 }
 
 inputs = {
-  project_id       = "able-armor-468408-v6"
-  name             = "dev-gke"
-  region           = "us-central1"
-  zones            = ["us-central1-a", "us-central1-b", "us-central1-c"]
-  network          = "dev-vpc"
-  subnetwork       = "dev-subnet"
-  ip_range_pods    = ""
-  ip_range_services= ""
-  release_channel  = "REGULAR"
+  project_id         = local.project_id
+  name               = "dev-gke"
+  region             = local.region
+  network            = local.network_name
+  subnetwork         = local.subnet_name
 
-  master_ipv4_cidr_block = "172.16.0.0/28"
+  ip_allocation_policy = {
+    cluster_secondary_range_name  = "pods"
+    services_secondary_range_name = "services"
+  }
 
+  remove_default_node_pool = true
   node_pools = [
     {
-      name       = "default-pool"
+      name         = "default-node-pool"
       machine_type = "e2-medium"
       node_count   = 1
+      min_count    = 1
+      max_count    = 3
+      disk_size_gb = 100
     }
   ]
+
+  master_ipv4_cidr_block = "172.16.0.0/28"
 }
