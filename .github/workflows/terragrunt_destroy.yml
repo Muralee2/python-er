@@ -1,0 +1,86 @@
+name: Terraform Destroy with Terragrunt
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  terraform-destroy:
+    name: Terragrunt Destroy
+    runs-on: ubuntu-latest
+    env:
+      GOOGLE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+      GOOGLE_REGION: ${{ secrets.GCP_REGION }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set gcloud project and region
+        run: |
+          gcloud config set project $GOOGLE_PROJECT
+          gcloud config set compute/region $GOOGLE_REGION
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Install Terragrunt
+        run: |
+          TG_VERSION="0.84.1"
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64
+          sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
+          sudo chmod +x /usr/local/bin/terragrunt
+
+      - name: Terragrunt Destroy gke-cluster
+        run: terragrunt destroy --auto-approve --non-interactive --working-dir=live/dev/gke-cluster
+
+      - name: Wait for GKE cluster deletion
+        run: |
+          RETRIES=20
+          while gcloud container clusters describe gke-cluster --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT &> /dev/null; do
+            echo "Waiting for GKE cluster to be deleted..."
+            sleep 15
+            RETRIES=$((RETRIES-1))
+            if [ $RETRIES -eq 0 ]; then
+              echo "GKE cluster deletion timeout"
+              exit 1
+            fi
+          done
+
+      - name: Terragrunt Destroy firewall
+        run: terragrunt destroy --auto-approve --non-interactive --working-dir=live/dev/firewall
+
+      - name: Wait for firewall rules deletion
+        run: |
+          RETRIES=20
+          while gcloud compute firewall-rules list --filter="network=dev-vpc" --project=$GOOGLE_PROJECT | grep -q dev-vpc; do
+            echo "Waiting for firewall rules to be deleted..."
+            sleep 15
+            RETRIES=$((RETRIES-1))
+            if [ $RETRIES -eq 0 ]; then
+              echo "Firewall rules deletion timeout"
+              exit 1
+            fi
+          done
+
+      - name: Terragrunt Destroy network
+        run: terragrunt destroy --auto-approve --non-interactive --working-dir=live/dev/network
+
+      - name: Wait for subnet deletion
+        run: |
+          RETRIES=20
+          while gcloud compute networks subnets describe dev-subnet --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT &> /dev/null; do
+            echo "Waiting for subnet to be deleted..."
+            sleep 15
+            RETRIES=$((RETRIES-1))
+            if [ $RETRIES -eq 0 ]; then
+              echo "Subnet deletion timeout"
+              exit 1
+            fi
+          done
