@@ -1,5 +1,5 @@
 terraform {
-  source = "https://github.com/terraform-google-modules/terraform-google-network.git//modules/vpc?ref=v7.1.0"
+  source = "terraform-google-modules/network/google//modules/vpc?ref=v7.1.0"
 }
 
 include "root" {
@@ -7,7 +7,6 @@ include "root" {
 }
 
 inputs = {
-  project_id   = read_terragrunt_config(find_in_parent_folders("env.hcl")).locals.project_id
-  network_name = "dev-vpc"
-  routing_mode = "REGIONAL"
+  project_id   = local.project_id
+  network_name = local.network_name
 }
