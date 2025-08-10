@@ -1,12 +1,3 @@
-terraform {
-  backend "gcs" {}
-}
-
-provider "google" {
-  project = var.project_id
-  region  = var.region
-}
-
 resource "google_compute_firewall" "allow_internal" {
   name    = "${var.network_name}-allow-internal"
   network = var.network_self_link
