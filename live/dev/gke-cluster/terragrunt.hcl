@@ -26,6 +26,10 @@ inputs = {
     services_secondary_range_name = "services"
   }
 
+  # These are REQUIRED by the module
+  ip_range_pods     = "pods"
+  ip_range_services = "services"
+
   remove_default_node_pool = true
   node_pools = [
     {
