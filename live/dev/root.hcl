@@ -2,7 +2,7 @@ locals {
   project_id   = "able-armor-468408-v6"
   region       = "us-central1"
   network_name = "dev-vpc"
-  subnet_name  = "dev-subnet"
+  subnet_name  = "dev-subnet1"
   subnet_cidr  = "10.0.0.0/24"
   cluster_name = "powerh"
 }
