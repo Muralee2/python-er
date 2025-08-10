@@ -17,24 +17,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Authenticate to GCP
+      # 2. Authenticate to Google Cloud
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      # 3. Set gcloud project & region
       - name: Set gcloud project & region
         run: |
           gcloud config set project $GOOGLE_PROJECT
           gcloud config set compute/region $GOOGLE_REGION
 
-      # 3. Install Terraform
+      # 4. Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
 
-      # 4. Install Terragrunt
+      # 5. Install Terragrunt
       - name: Install Terragrunt
         run: |
           TG_VERSION="0.84.1"
@@ -42,11 +43,11 @@ jobs:
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           sudo chmod +x /usr/local/bin/terragrunt
 
-      # 5. Check GCS for state files
-      - name: Check if state files exist
+      # 6. Check GCS for state files of modules to destroy (exclude gke-cluster)
+      - name: Check if network and firewall state files exist
         id: check_state
         run: |
-          modules=("network" "firewall" "gke-cluster")
+          modules=("network" "firewall")
           missing=0
           for module in "${modules[@]}"; do
             echo "Checking $module state..."
@@ -62,12 +63,12 @@ jobs:
             exit 0
           fi
 
-      # 6. Destroy using Terragrunt
-      - name: Destroy all Terragrunt modules
+      # 7. Destroy only network and firewall modules
+      - name: Destroy network and firewall modules only
         run: |
           cd live/dev
-          terragrunt destroy --all \
-            --auto-approve \
-            --non-interactive \
-            --working-dir=.
+          echo "Destroying network module..."
+          terragrunt destroy --auto-approve --non-interactive --working-dir=network
+          echo "Destroying firewall module..."
+          terragrunt destroy --auto-approve --non-interactive --working-dir=firewall
 
