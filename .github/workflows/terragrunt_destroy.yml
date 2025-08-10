@@ -60,9 +60,22 @@ jobs:
      #       fi
      #     done
 
-      # Destroy firewall resources
+           # Destroy firewall resources
       - name: Terragrunt Destroy Firewall
         run: terragrunt destroy --auto-approve --non-interactive --working-dir=live/dev/firewall
+
+      # Force delete any remaining firewall rules before waiting
+      - name: Force delete leftover firewall rules
+        run: |
+          RULES=$(gcloud compute firewall-rules list --filter="network=dev-vpc" --format="value(name)" --project=$GOOGLE_PROJECT)
+          if [ -n "$RULES" ]; then
+            echo "Force deleting leftover firewall rules..."
+            for rule in $RULES; do
+              gcloud compute firewall-rules delete "$rule" --quiet --project=$GOOGLE_PROJECT || true
+            done
+          else
+            echo "No leftover firewall rules found."
+          fi
 
       # Wait for firewall rules deletion
       - name: Wait for firewall rules deletion
@@ -77,10 +90,6 @@ jobs:
               exit 1
             fi
           done
-
-      # Destroy network resources
-      - name: Terragrunt Destroy Network
-        run: terragrunt destroy --auto-approve --non-interactive --working-dir=live/dev/network
 
       # Wait for subnet deletion
       - name: Wait for subnet deletion
