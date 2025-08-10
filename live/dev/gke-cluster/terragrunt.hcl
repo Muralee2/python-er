@@ -1,6 +1,7 @@
 terraform {
-  source = "git::https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/private-cluster?ref=v29.0.0"
+  source = "https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/private-cluster?ref=v29.0.0"
 }
+
 
 include "root" {
   path = find_in_parent_folders()
