@@ -40,7 +40,7 @@ inputs = {
       node_count   = 1
       min_count    = 1
       max_count    = 2
-      disk_size_gb = 80
+      disk_size_gb = 60
     }
   ]
 
