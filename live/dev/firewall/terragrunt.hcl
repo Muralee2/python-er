@@ -1,5 +1,5 @@
 terraform {
-  source = "source = "../../../modules/firewall"
+  source  = "../../../modules/firewall"
 }
 
 include {
@@ -11,7 +11,7 @@ locals {
 }
 
 dependencies {
-  paths = ["../network"]
+  paths = ["../../../modules/network"]
 }
 
 inputs = {
