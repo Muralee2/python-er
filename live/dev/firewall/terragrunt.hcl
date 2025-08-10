@@ -1,5 +1,5 @@
 terraform {
-  source = "https://github.com/terraform-google-modules/terraform-google-network.git//modules/firewall-rules?ref=v7.1.0"
+  source = "terraform-google-modules/network/google//modules/firewall-rules?ref=v7.1.0"
 }
 
 include "root" {
@@ -7,19 +7,24 @@ include "root" {
 }
 
 inputs = {
-  project_id   = read_terragrunt_config(find_in_parent_folders("env.hcl")).locals.project_id
-  network      = "dev-vpc"
+  project_id   = local.project_id
+  network_name = local.network_name
+
   rules = [
     {
       name                    = "allow-ssh"
-      description             = "Allow SSH from anywhere"
       direction               = "INGRESS"
+      allow = [
+        {
+          protocol = "tcp"
+          ports    = ["22"]
+        }
+      ]
+      source_ranges           = ["0.0.0.0/0"]
+      target_tags             = ["ssh-access"]
       priority                = 1000
-      ranges                  = ["0.0.0.0/0"]
-      allow = [{
-        protocol = "tcp"
-        ports    = ["22"]
-      }]
+      disabled                = false
     }
   ]
 }
+
