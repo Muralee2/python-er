@@ -1,5 +1,5 @@
 locals {
-  project_id   = "your-gcp-project-id"
+  project_id   = "able-armor-468408-v6"
   region       = "us-central1"
   network_name = "dev-vpc"
   subnet_name  = "dev-subnet"
@@ -10,7 +10,7 @@ locals {
 remote_state {
   backend = "gcs"
   config = {
-    bucket         = "your-terraform-state-bucket"
+    bucket         = "samurai-og1"
     prefix         = "dev/${path_relative_to_include()}"
     project        = local.project_id
     location       = "US"
