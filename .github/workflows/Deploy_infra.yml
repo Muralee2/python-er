@@ -37,16 +37,16 @@ jobs:
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           sudo chmod +x /usr/local/bin/terragrunt
 
-      # 1️⃣ Apply Network first
+     # 1️⃣ Apply Network first
       - name: Apply Network
-        run: terragrunt apply --non-interactive --working-dir=live/dev/network
+        run: terragrunt apply -auto-approve --non-interactive --working-dir=live/dev/network
 
-      # 2️⃣ Apply Firewall
+     # 2️⃣ Apply Firewall
       - name: Apply Firewall
-        run: terragrunt apply --non-interactive --working-dir=live/dev/firewall
+        run: terragrunt apply -auto-approve --non-interactive --working-dir=live/dev/firewall
 
-      # 3️⃣ Apply GKE Cluster after dependencies exist
+    # 3️⃣ Apply GKE Cluster after dependencies exist
       - name: Apply GKE Cluster
         if: github.ref == 'refs/heads/main'
-        run: terragrunt apply --non-interactive --working-dir=live/dev/gke-cluster
+        run: terragrunt apply -auto-approve --non-interactive --working-dir=live/dev/gke-cluster
 
