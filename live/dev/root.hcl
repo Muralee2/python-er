@@ -1,10 +1,10 @@
 locals {
   project_id   = "able-armor-468408-v6"
   region       = "us-central1"
-  network_name = "dev-vpc2"
-  subnet_name  = "dev-subnet1"
+  network_name = "dev-vpc3"
+  subnet_name  = "dev-subnet2"
   subnet_cidr  = "10.0.0.0/23"
-  cluster_name = "powerh"
+  cluster_name = "power2"
 }
 
 inputs = {
@@ -19,7 +19,7 @@ inputs = {
 remote_state {
   backend = "gcs"
   config = {
-    bucket   = "samurai-og2"
+    bucket   = "og-samurai"
     prefix   = "${path_relative_to_include()}"
     project  = local.project_id
     location = "US"
