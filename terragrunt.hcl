@@ -27,7 +27,7 @@ inputs = {
 remote_state {
   backend = "gcs"
   config = {
-    bucket = "your-terraform-state-bucket"
+    bucket = "samurai-og1"
     prefix = "gke-infra/state"
   }
 }
