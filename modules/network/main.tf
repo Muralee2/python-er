@@ -1,4 +1,3 @@
-https://github.com/Muralee2/GKE-PROJECT_FINAL.git
 resource "google_compute_network" "vpc" {
   name                    = var.network_name
   auto_create_subnetworks = false
