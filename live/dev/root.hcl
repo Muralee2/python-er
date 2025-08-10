@@ -19,7 +19,7 @@ remote_state {
   backend = "gcs"
   config = {
     bucket         = "samurai-og1"
-    prefix         = "dev/${path_relative_to_include()}"
+    prefix         = "terraform/state"
     project        = local.project_id
     location       = "US"
     encryption_key = null
