@@ -1,5 +1,5 @@
 terraform {
-  source = "https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/private-cluster?ref=v31.0.0"
+ source = "../../../modules/gke-cluster"
 }
 
 include {
