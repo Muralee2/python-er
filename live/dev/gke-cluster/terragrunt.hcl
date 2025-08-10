@@ -19,6 +19,7 @@ inputs = {
   name         = local.parent_config.inputs.cluster_name
   region       = local.parent_config.inputs.region
   node_count        = 1
+  node_machine_type = "e2-medium"
   # ✅ Match the variable names in the module exactly
   network_name = local.parent_config.inputs.network_name
   subnet_name  = local.parent_config.inputs.subnet_name
