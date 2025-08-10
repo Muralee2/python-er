@@ -1,5 +1,5 @@
 terraform {
-  source = "https://github.com/terraform-google-modules/terraform-google-network.git//modules/firewall-rules?ref=v7.1.0"
+  source = "source = "../../../modules/network"
 }
 
 include {
