@@ -1,8 +1,8 @@
 resource "google_compute_firewall" "allow_internal" {
   name    = "${var.network_name}-allow-internal"
-  network = var.network_self_link
+  network = var.network_name  # just the name, e.g. "my-vpc"
 
-  allows {
+  allow {
     protocol = "all"
   }
 
@@ -11,9 +11,9 @@ resource "google_compute_firewall" "allow_internal" {
 
 resource "google_compute_firewall" "allow_ssh" {
   name    = "${var.network_name}-allow-ssh"
-  network = var.network_self_link
+  network = var.network_name  # just the name
 
-  allows {
+  allow {
     protocol = "tcp"
     ports    = ["22"]
   }
