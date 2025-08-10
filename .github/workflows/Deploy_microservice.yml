@@ -43,7 +43,6 @@ jobs:
     - name: Get GKE Credentials
       run: |
         gcloud container clusters get-credentials $CLUSTER_NAME \
-          --zone $CLUSTER_ZONE \
           --project $PROJECT_ID
 
     # 6. Fetch Static IP from the correct region
