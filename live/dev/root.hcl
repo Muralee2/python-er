@@ -19,7 +19,7 @@ inputs = {
 remote_state {
   backend = "gcs"
   config = {
-    bucket   = "og-samurai"
+    bucket   = "firestrom1"
     prefix   = "${path_relative_to_include()}"
     project  = local.project_id
     location = "US"
