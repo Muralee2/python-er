@@ -1,10 +1,9 @@
-# infrastructure/network/terragrunt.hcl
 terraform {
   source = "https://github.com/terraform-google-modules/terraform-google-network.git//modules/vpc?ref=v7.1.0"
 }
 
 include {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("root.hcl")
 }
 
 inputs = {
