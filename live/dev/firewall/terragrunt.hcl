@@ -2,6 +2,11 @@ terraform {
   source = "../../../modules/firewall"
 }
 
+locals {
+  project_id = include.root.locals.project_id
+  region     = include.root.locals.region
+}
+
 dependency "network" {
   config_path = "../network"
 }
