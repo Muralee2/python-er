@@ -15,14 +15,13 @@ dependencies {
 }
 
 inputs = {
-  project_id   = local.parent_config.inputs.project_id
-  name         = local.parent_config.inputs.cluster_name
-  region       = local.parent_config.inputs.region
-  node_count        = 1
-  node_machine_type = "e2-medium"
-  # ✅ Match the variable names in the module exactly
-  network_name = local.parent_config.inputs.network_name
-  subnet_name  = local.parent_config.inputs.subnet_name
+  project_id         = local.parent_config.inputs.project_id
+  name               = local.parent_config.inputs.cluster_name
+  region             = local.parent_config.inputs.region
+  network_name       = local.parent_config.inputs.network_name
+  subnet_name        = local.parent_config.inputs.subnet_name
+
+  remove_default_node_pool = true
 
   ip_allocation_policy = {
     cluster_secondary_range_name  = "pods"
@@ -32,7 +31,9 @@ inputs = {
   ip_range_pods     = "pods"
   ip_range_services = "services"
 
-  remove_default_node_pool = true
+  master_ipv4_cidr_block = "172.16.0.0/28"
+
+  # Node pool config
   node_pools = [
     {
       name         = "default-node-pool"
@@ -41,8 +42,8 @@ inputs = {
       min_count    = 1
       max_count    = 2
       disk_size_gb = 30
+      disk_type    = "pd-standard"   # Use standard persistent disk (HDD) to avoid SSD quota limits
     }
   ]
-
-  master_ipv4_cidr_block = "172.16.0.0/28"
 }
+
