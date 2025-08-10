@@ -7,15 +7,15 @@ include {
 }
 
 inputs = {
-  project_id              = inputs.project_id
-  network_name            = inputs.network_name
+  project_id              = include.inputs.project_id
+  network_name            = include.network_name
   auto_create_subnetworks = false
 
   subnets = [
     {
-      subnet_name           = inputs.subnet_name
-      subnet_ip             = inputs.subnet_cidr
-      subnet_region         = inputs.region
+      subnet_name           = include.subnet_name
+      subnet_ip             = include.subnet_cidr
+      subnet_region         = include.region
       subnet_private_access = true
       subnet_flow_logs      = true
     }
