@@ -1,5 +1,5 @@
 terraform {
- source = "../../../modules/gke-cluster"
+  source = "../../../modules/gke-cluster"
 }
 
 include {
@@ -15,18 +15,19 @@ dependencies {
 }
 
 inputs = {
-  project_id         = local.parent_config.inputs.project_id
-  name               = local.parent_config.inputs.cluster_name
-  region             = local.parent_config.inputs.region
-  network            = local.parent_config.inputs.network_name
-  subnetwork         = local.parent_config.inputs.subnet_name
+  project_id   = local.parent_config.inputs.project_id
+  name         = local.parent_config.inputs.cluster_name
+  region       = local.parent_config.inputs.region
+
+  # ✅ Match the variable names in the module exactly
+  network_name = local.parent_config.inputs.network_name
+  subnet_name  = local.parent_config.inputs.subnet_name
 
   ip_allocation_policy = {
     cluster_secondary_range_name  = "pods"
     services_secondary_range_name = "services"
   }
 
-  # These are REQUIRED by the module
   ip_range_pods     = "pods"
   ip_range_services = "services"
 
