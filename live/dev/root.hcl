@@ -14,8 +14,6 @@ inputs = {
   region       = local.region
 }
 
-# Remote state (GCS)
-
 remote_state {
   backend = "gcs"
   config = {
@@ -23,8 +21,16 @@ remote_state {
     prefix   = "${path_relative_to_include()}"
     project  = local.project_id
     location = "US"
-
   }
 }
 
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+provider "google" {
+  project = "${local.project_id}"
+  region  = "${local.region}"
+}
+EOF
 }
