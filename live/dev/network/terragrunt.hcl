@@ -2,10 +2,11 @@ terraform {
   source = "../../../modules/network"
 }
 
+include {
+  path = find_in_parent_folders()
+}
+
 inputs = {
-  project_id    = local.project_id
-  region        = local.region
-  network_name  = "dev-vpc"
-  subnet_name   = "dev-subnet"
-  subnet_cidr   = "10.10.0.0/16"
+  project_id = local.project_id
+  region     = local.region
 }
