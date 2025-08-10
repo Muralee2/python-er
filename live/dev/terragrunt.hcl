@@ -6,9 +6,10 @@ locals {
 remote_state {
   backend = "gcs"
   config = {
-    bucket         = "samurai-og1"
-    prefix         = "terraform/state"
-    project        = local.project_id
-    location       = local.region
+    bucket   = "samurai-og1"
+    prefix   = "terraform/state"
+    project  = local.project_id
+    location = local.region
   }
 }
+
