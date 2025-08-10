@@ -6,6 +6,14 @@ locals {
   subnet_cidr  = "10.0.0.0/24"
 }
 
+inputs = {
+  project_id   = local.project_id
+  network_name = local.network_name
+  subnet_name  = local.subnet_name
+  subnet_cidr  = local.subnet_cidr
+  region       = local.region
+}
+
 # Remote state (GCS)
 remote_state {
   backend = "gcs"
