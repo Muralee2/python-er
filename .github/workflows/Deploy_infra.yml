@@ -37,17 +37,21 @@ jobs:
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           sudo chmod +x /usr/local/bin/terragrunt
 
-      - name: Terragrunt Init network
-        run: terragrunt init --non-interactive --working-dir=live/dev/network
-
-      - name: Terragrunt Apply network
+      - name: Terragrunt Apply - Network
         run: terragrunt apply --auto-approve --non-interactive --working-dir=live/dev/network
 
-      - name: Terragrunt Init firewall
+      - name: Wait after Network creation
+        run: sleep 30
+
+      - name: Terragrunt Init - Firewall
         run: terragrunt init --non-interactive --working-dir=live/dev/firewall
 
-      - name: Terragrunt Apply firewall
+      - name: Terragrunt Apply - Firewall
         run: terragrunt apply --auto-approve --non-interactive --working-dir=live/dev/firewall
+
+      - name: Wait after Firewall creation
+        run: sleep 30
+
 
       - name: Terragrunt Init gke-cluster
         run: terragrunt init --non-interactive --working-dir=live/dev/gke-cluster
