@@ -1,8 +1,8 @@
 locals {
   project_id   = "able-armor-468408-v6"
   region       = "us-central1"
-  network_name = "dev-vpc3"
-  subnet_name  = "dev-subnet2"
+  network_name = "dev-vpc6"
+  subnet_name  = "dev-subnet4"
   subnet_cidr  = "10.0.0.0/23"
   cluster_name = "power2"
 }
