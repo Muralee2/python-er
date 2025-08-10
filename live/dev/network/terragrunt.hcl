@@ -26,3 +26,15 @@ inputs = {
   ]
 }
 
+ secondary_ip_range = [
+      {
+        range_name    = "pods"
+        ip_cidr_range = "10.1.0.0/16"
+      },
+      {
+        range_name    = "services"
+        ip_cidr_range = "10.2.0.0/20"
+      }
+    ]
+  }
+
