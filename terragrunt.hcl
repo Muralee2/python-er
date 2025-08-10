@@ -1,9 +1,8 @@
+# terragrunt.hcl (root)
 terraform {
-  source = "terraform-google-modules/network/google//modules/vpc?ref=v7.1.0"
-
   backend "gcs" {
-    bucket  = "samurai-og1" # GCS bucket name
-    prefix  = "network/state"               # Folder path inside the bucket
+    bucket = "samurai-og1" # Create this bucket in GCS first
+    prefix = "gke-infra/state"              # Path inside the bucket
   }
 }
 
@@ -15,6 +14,7 @@ locals {
   subnet_cidr     = "10.0.0.0/24"
 }
 
+# Apply these inputs to all child modules
 inputs = {
   project_id   = local.project_id
   region       = local.region
@@ -22,3 +22,13 @@ inputs = {
   subnet_name  = local.subnet_name
   subnet_cidr  = local.subnet_cidr
 }
+
+# Make all child terragrunt.hcl files inherit from here
+remote_state {
+  backend = "gcs"
+  config = {
+    bucket = "your-terraform-state-bucket"
+    prefix = "gke-infra/state"
+  }
+}
+
