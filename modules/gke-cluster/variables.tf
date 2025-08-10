@@ -19,8 +19,9 @@ variable "subnet_name" {
 }
 variable "node_machine_type" {
   description = "The machine type for GKE nodes"
-  type        = string
+  default     = "e2-medium"
 }
+
 
 variable "node_count" {
   description = "The initial number of nodes in the node pool"
