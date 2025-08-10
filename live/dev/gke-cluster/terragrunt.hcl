@@ -16,7 +16,7 @@ dependencies {
 
 inputs = {
   project_id         = local.parent_config.inputs.project_id
-  name               = "dev-gke"
+  name               = local.parent_config.inputs.cluster_name
   region             = local.parent_config.inputs.region
   network            = local.parent_config.inputs.network_name
   subnetwork         = local.parent_config.inputs.subnet_name
