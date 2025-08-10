@@ -1,26 +1,28 @@
 locals {
-  project_id      = "able-armor-468408-v6"
-  region          = "us-central1"
-  network_name    = "custom-vpc"
-  subnet_name     = "custom-subnet"
-  subnet_cidr     = "10.0.0.0/24"
+  project_id   = "your-gcp-project-id"
+  region       = "us-central1"
+  network_name = "dev-vpc"
+  subnet_name  = "dev-subnet"
+  subnet_cidr  = "10.0.0.0/24"
 }
 
+# Remote state (GCS)
 remote_state {
   backend = "gcs"
   config = {
-    bucket         = "my-terraform-state-bucket"
-    prefix         = "${path_relative_to_include()}"
+    bucket         = "your-terraform-state-bucket"
+    prefix         = "dev/${path_relative_to_include()}"
     project        = local.project_id
-    location       = "us"
+    location       = "US"
+    encryption_key = null
   }
 }
 
-inputs = {
-  project_id   = local.project_id
-  region       = local.region
-  network_name = local.network_name
-  subnet_name  = local.subnet_name
-  subnet_cidr  = local.subnet_cidr
+# Provider
+terraform {
+  extra_arguments "provider_config" {
+    commands = get_terraform_commands_that_need_vars()
+    optional_var_files = []
+  }
 }
 
