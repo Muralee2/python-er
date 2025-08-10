@@ -7,8 +7,8 @@ dependency "network" {
 }
 
 inputs = {
-  project_id        = "able-armor-468408-v6"
-  region            = "us-central1"
+  project_id        = "local.project_id"
+  region            = "local.region"
   cluster_name      = "dev-cluster"
   network_self_link = dependency.network.outputs.network_self_link
   subnet_self_link  = dependency.network.outputs.subnet_self_link
