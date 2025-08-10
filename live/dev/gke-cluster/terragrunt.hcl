@@ -33,8 +33,8 @@ inputs = {
   region             = local.parent_config.inputs.region
 
   # Pull values from network module outputs
-  network            = dependency.network.outputs.network_name
-  subnetwork         = dependency.network.outputs.subnet_name
+  network    = dependency.network.outputs.network_self_link
+  subnetwork = dependency.network.outputs.subnet_self_link
 
   ip_allocation_policy = {
     cluster_secondary_range_name  = "pods"
