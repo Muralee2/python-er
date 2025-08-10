@@ -25,4 +25,6 @@ variable "node_machine_type" {
 variable "node_count" {
   description = "The initial number of nodes in the node pool"
   type        = number
+  default     = 1
 }
+
