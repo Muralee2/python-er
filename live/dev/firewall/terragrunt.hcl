@@ -10,11 +10,14 @@ include {
   path = find_in_parent_folders()
 }
 
-# Ensure firewall waits for network creation
 dependency "network" {
   config_path = "../network"
-}
 
+  # Optional: If running `terragrunt plan-all` before network is applied, use mock outputs
+  mock_outputs = {
+    network_self_link = "mock-network-output"
+  }
+}
 inputs = {
   project_id = "able-armor-468408-v6"
   name       = "dev-firewall"
