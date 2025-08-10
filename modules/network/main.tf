@@ -1,21 +1,4 @@
-terraform {
-  backend "gcs" {}
-}
-
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 5.0"
-    }
-  }
-}
-
-provider "google" {
-  project = var.project_id
-  region  = var.region
-}
-
+https://github.com/Muralee2/GKE-PROJECT_FINAL.git
 resource "google_compute_network" "vpc" {
   name                    = var.network_name
   auto_create_subnetworks = false
