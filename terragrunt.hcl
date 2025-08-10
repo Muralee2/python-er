@@ -1,16 +1,24 @@
 terraform {
-  extra_arguments "common_vars" {
-    commands = get_terraform_commands_that_need_vars()
-    required_var_files = []
+  source = "terraform-google-modules/network/google//modules/vpc?ref=v7.1.0"
+
+  backend "gcs" {
+    bucket  = "samurai-og1" # GCS bucket name
+    prefix  = "network/state"               # Folder path inside the bucket
   }
 }
 
-remote_state {
-  backend = "gcs"
-  config = {
-    bucket   = "samurai-og1"
-    prefix   = "terraform/state"
-    project  = read_terragrunt_config(find_in_parent_folders("env.hcl")).locals.project_id
-    location = read_terragrunt_config(find_in_parent_folders("env.hcl")).locals.region
-  }
+locals {
+  project_id      = "your-gcp-project-id"
+  region          = "us-central1"
+  network_name    = "custom-vpc"
+  subnet_name     = "custom-subnet"
+  subnet_cidr     = "10.0.0.0/24"
+}
+
+inputs = {
+  project_id   = local.project_id
+  region       = local.region
+  network_name = local.network_name
+  subnet_name  = local.subnet_name
+  subnet_cidr  = local.subnet_cidr
 }
