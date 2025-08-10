@@ -17,25 +17,15 @@ variable "subnet_name" {
   description = "Name of the subnetwork"
   type        = string
 }
-variable "node_machine_type" {
-  description = "The machine type for GKE nodes"
-  default     = "e2-medium"
+variable "node_pools" {
+  description = "List of node pools configuration"
+  type = list(object({
+    name         = string
+    machine_type = string
+    node_count   = number
+    min_count    = number
+    max_count    = number
+    disk_size_gb = number
+    disk_type    = string
+  }))
 }
-
-
-variable "node_count" {
-  description = "The initial number of nodes in the node pool"
-  type        = number
-  default     = 1
-}
-
-variable "disk_size_gb" {
-  type    = number
-  default = 30
-}
-
-variable "disk_type" {
-  type    = string
-  default = "pd-standard"
-}
-
