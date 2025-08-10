@@ -23,18 +23,8 @@ remote_state {
     prefix   = "${path_relative_to_include()}"
     project  = local.project_id
     location = "US"
-    # encryption_key removed to avoid <nil> error
+
   }
 }
 
-}
-
-generate "backend" {
-  path      = "backend.tf"
-  if_exists = "overwrite"
-  contents  = <<EOF
-terraform {
-  backend "gcs" {}
-}
-EOF
 }
