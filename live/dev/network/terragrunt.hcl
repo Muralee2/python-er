@@ -1,5 +1,5 @@
 terraform {
-  source = "../../../network"  # or correct relative local path to your network module folder
+  source = "../../../modules/network"
 }
 
 include {
