@@ -10,23 +10,37 @@ locals {
   parent_config = read_terragrunt_config(find_in_parent_folders("root.hcl"))
 }
 
-dependencies {
-  paths = ["../network", "../firewall"]
+# Explicit dependency on the network module
+dependency "network" {
+  config_path = "../network"
+
+  # Mock outputs for plan-only runs without applying network
+  mock_outputs = {
+    network_name = "placeholder-network"
+    subnet_name  = "placeholder-subnet"
+  }
+  mock_outputs_allowed_terraform_commands = ["validate", "plan"]
+}
+
+# Optional: dependency on firewall if needed for ordering only
+dependency "firewall" {
+  config_path = "../firewall"
 }
 
 inputs = {
   project_id         = local.parent_config.inputs.project_id
   name               = "dev-gke"
   region             = local.parent_config.inputs.region
-  network            = local.parent_config.inputs.network_name
-  subnetwork         = local.parent_config.inputs.subnet_name
+
+  # Pull values from network module outputs
+  network            = dependency.network.outputs.network_name
+  subnetwork         = dependency.network.outputs.subnet_name
 
   ip_allocation_policy = {
     cluster_secondary_range_name  = "pods"
     services_secondary_range_name = "services"
   }
 
-  # These are REQUIRED by the module
   ip_range_pods     = "pods"
   ip_range_services = "services"
 
@@ -44,3 +58,4 @@ inputs = {
 
   master_ipv4_cidr_block = "172.16.0.0/28"
 }
+
