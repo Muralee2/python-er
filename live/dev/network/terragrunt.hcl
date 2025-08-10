@@ -6,6 +6,10 @@ include {
   path = find_in_parent_folders("terragrunt.hcl")
 }
 
+locals {
+  parent_config = read_terragrunt_config(find_in_parent_folders("terragrunt.hcl"))
+}
+
 inputs = {
   project_id              = include.inputs.project_id
   network_name            = include.inputs.network_name
