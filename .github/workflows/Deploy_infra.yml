@@ -52,6 +52,18 @@ jobs:
       - name: Wait after Firewall creation
         run: sleep 30
 
+      - name: Wait for subnet to be ready
+        run: |
+         RETRIES=10
+         while ! gcloud compute networks subnets describe dev-subnet --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT &> /dev/null; do
+         echo "Waiting for subnet to be ready..."
+         sleep 15
+         RETRIES=$((RETRIES-1))
+         if [ $RETRIES -eq 0 ]; then
+         echo "Subnet not ready after waiting"
+         exit 1
+         fi
+         done
 
       - name: Terragrunt Init gke-cluster
         run: terragrunt init --non-interactive --working-dir=live/dev/gke-cluster
