@@ -3,7 +3,7 @@ locals {
   region       = "us-central1"
   network_name = "dev-vpc2"
   subnet_name  = "dev-subnet1"
-  subnet_cidr  = "10.0.0.0/24"
+  subnet_cidr  = "10.0.0.0/23"
   cluster_name = "powerh"
 }
 
