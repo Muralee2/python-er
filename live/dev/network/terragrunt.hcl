@@ -1,3 +1,4 @@
+# infrastructure/network/terragrunt.hcl
 terraform {
   source = "https://github.com/terraform-google-modules/terraform-google-network.git//modules/vpc?ref=v7.1.0"
 }
