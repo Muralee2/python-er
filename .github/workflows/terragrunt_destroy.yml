@@ -38,16 +38,13 @@ jobs:
           sudo chmod +x /usr/local/bin/terragrunt
 
       - name: Destroy firewall module first
-        run: |
-          cd live/dev/firewall
-          terragrunt destroy -auto-approve
+        working-directory: ./live/dev/firewall
+        run: terragrunt destroy -auto-approve
 
       - name: Destroy network module second
-        run: |
-          cd ../network
-          terragrunt destroy -auto-approve
+        working-directory: ./live/dev/network
+        run: terragrunt destroy -auto-approve
 
       - name: Destroy GKE cluster last (optional)
-        run: |
-          cd ../gke-cluster
-          terragrunt destroy -auto-approve
+        working-directory: ./live/dev/gke-cluster
+        run: terragrunt destroy -auto-approve
