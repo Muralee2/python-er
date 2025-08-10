@@ -15,11 +15,11 @@ dependencies {
 }
 
 inputs = {
-  project_id         = local.parent.inputs.project_id
+  project_id         = local.parent_config.inputs.project_id
   name               = "dev-gke"
-  region             = local.parent.inputs.region
-  network            = local.parent.inputs.network_name
-  subnetwork         = local.parent.inputs.subnet_name
+  region             = local.parent_config.inputs.region
+  network            = local.parent_config.inputs.network_name
+  subnetwork         = local.parent_config.inputs.subnet_name
 
   ip_allocation_policy = {
     cluster_secondary_range_name  = "pods"
