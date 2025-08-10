@@ -1,14 +1,10 @@
 locals {
-  project_id = read_terragrunt_config(find_in_parent_folders("env.hcl")).locals.project_id
-  region     = read_terragrunt_config(find_in_parent_folders("env.hcl")).locals.region
+  env_config = read_terragrunt_config(find_in_parent_folders("env.hcl"))
 }
 
-remote_state {
-  backend = "gcs"
-  config = {
-    bucket   = "samurai-og1"
-    prefix   = "terraform/state"
-    project  = local.project_id
-    location = local.region
+inputs = merge(
+  local.env_config.inputs,
+  {
+    environment = "dev"
   }
-}
+)
