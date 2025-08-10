@@ -11,15 +11,15 @@ locals {
 }
 
 inputs = {
-  project_id              = local.parent.inputs.project_id
-  network_name            = local.parent.network_name
+  project_id              = local.parent_config.inputs.project_id
+  network_name            = local.parent_config.network_name
   auto_create_subnetworks = false
 
   subnets = [
     {
-      subnet_name           = local.parent.subnet_name
-      subnet_ip             = local.parent.subnet_cidr
-      subnet_region         = local.parent.region
+      subnet_name           = local.parent_config.subnet_name
+      subnet_ip             = local.parent_config.subnet_cidr
+      subnet_region         = local.parent_config.region
       subnet_private_access = true
       subnet_flow_logs      = true
     }
