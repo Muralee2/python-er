@@ -36,3 +36,4 @@ variable "disk_type" {
 variable "node_machine_type" {
   description = "The machine type for GKE nodes"
   default     = "e2-medium"
+}
