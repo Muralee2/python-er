@@ -15,8 +15,8 @@ dependencies {
 }
 
 inputs = {
-  project_id = include.inputs.project_id
-  network    = include.inputs.network_name
+  project_id = local.parent.inputs.project_id
+  network    = local.parent.inputs.network_name
 
   rules = [
     {
