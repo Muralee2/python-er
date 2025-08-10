@@ -1,30 +1,29 @@
 terraform {
-  source = "terraform-google-modules/network/google//modules/firewall-rules?ref=v7.1.0"
+  source = "https://github.com/terraform-google-modules/terraform-google-network.git//modules/firewall-rules?ref=v7.1.0"
 }
 
-include "root" {
+include {
   path = find_in_parent_folders()
 }
 
 inputs = {
-  project_id   = local.project_id
-  network_name = local.network_name
+  network = "dev-vpc"
 
   rules = [
     {
-      name                    = "allow-ssh"
-      direction               = "INGRESS"
+      name        = "allow-ssh"
+      description = "Allow SSH from anywhere"
+      direction   = "INGRESS"
+      priority    = 1000
+      ranges      = ["0.0.0.0/0"]
       allow = [
         {
           protocol = "tcp"
           ports    = ["22"]
         }
       ]
-      source_ranges           = ["0.0.0.0/0"]
-      target_tags             = ["ssh-access"]
-      priority                = 1000
-      disabled                = false
     }
   ]
 }
+
 
