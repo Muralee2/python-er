@@ -17,3 +17,12 @@ variable "subnet_name" {
   description = "Name of the subnetwork"
   type        = string
 }
+variable "node_machine_type" {
+  description = "The machine type for GKE nodes"
+  type        = string
+}
+
+variable "node_count" {
+  description = "The initial number of nodes in the node pool"
+  type        = number
+}
