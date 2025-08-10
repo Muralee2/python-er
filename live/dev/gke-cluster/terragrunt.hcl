@@ -11,11 +11,11 @@ dependencies {
 }
 
 inputs = {
-  project_id         = inputs.project_id
+  project_id         = include.inputs.project_id
   name               = "dev-gke"
-  region             = inputs.region
-  network            = inputs.network_name
-  subnetwork         = inputs.subnet_name
+  region             = include.inputs.region
+  network            = include.inputs.network_name
+  subnetwork         = include.inputs.subnet_name
 
   ip_allocation_policy = {
     cluster_secondary_range_name  = "pods"
