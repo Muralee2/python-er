@@ -1,5 +1,5 @@
 terraform {
-  source = "https://github.com/terraform-google-modules/terraform-google-network.git//modules/vpc?ref=v7.1.0"
+  source = "../../network"  # or correct relative local path to your network module folder
 }
 
 include {
