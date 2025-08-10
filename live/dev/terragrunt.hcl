@@ -1,6 +1,6 @@
 locals {
-  project_id = "able-armor-468408-v6"
-  region     = "us-central1"
+  project_id = read_terragrunt_config(find_in_parent_folders("env.hcl")).locals.project_id
+  region     = read_terragrunt_config(find_in_parent_folders("env.hcl")).locals.region
 }
 
 remote_state {
@@ -12,4 +12,3 @@ remote_state {
     location = local.region
   }
 }
-
