@@ -1,5 +1,5 @@
 terraform {
-  source = "source = "../../../modules/network"
+  source = "source = "../../../modules/firewall"
 }
 
 include {
