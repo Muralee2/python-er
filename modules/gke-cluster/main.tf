@@ -5,6 +5,14 @@ resource "google_container_cluster" "gke" {
   # Just the names instead of full URLs
   network    = var.network_name
   subnetwork = var.subnet_name
+  
+node_config {
+    machine_type = var.node_machine_type
+    disk_size_gb = var.disk_size_gb
+    disk_type    = var.disk_type  # <- Make sure this line exists and uses your variable
+
+    # other node_config fields...
+  }
 
   remove_default_node_pool = true
   initial_node_count       = 1
