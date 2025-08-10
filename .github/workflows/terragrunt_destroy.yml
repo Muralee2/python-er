@@ -91,6 +91,29 @@ jobs:
             fi
           done
 
+           # Force delete resources that block subnet deletion
+      - name: Force cleanup subnet dependencies
+        run: |
+          echo "Checking for resources in dev-subnet..."
+          
+          # Delete any static IPs in the subnet
+          IPS=$(gcloud compute addresses list --filter="subnetwork:dev-subnet" --format="value(name)" --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT)
+          for ip in $IPS; do
+            gcloud compute addresses delete "$ip" --quiet --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT || true
+          done
+          
+          # Delete forwarding rules in the subnet
+          RULES=$(gcloud compute forwarding-rules list --filter="subnetwork:dev-subnet" --format="value(name)" --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT)
+          for rule in $RULES; do
+            gcloud compute forwarding-rules delete "$rule" --quiet --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT || true
+          done
+          
+          # Delete routers (Cloud NAT)
+          ROUTERS=$(gcloud compute routers list --filter="network:dev-vpc" --format="value(name)" --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT)
+          for router in $ROUTERS; do
+            gcloud compute routers delete "$router" --quiet --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT || true
+          done
+
       # Wait for subnet deletion
       - name: Wait for subnet deletion
         run: |
