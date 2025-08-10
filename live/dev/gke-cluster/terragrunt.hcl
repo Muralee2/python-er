@@ -6,6 +6,10 @@ include {
   path = find_in_parent_folders("terragrunt.hcl")
 }
 
+locals {
+  parent_config = read_terragrunt_config(find_in_parent_folders("terragrunt.hcl"))
+}
+
 dependencies {
   paths = ["../network", "../firewall"]
 }
