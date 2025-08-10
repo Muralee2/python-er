@@ -42,23 +42,23 @@ jobs:
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           sudo chmod +x /usr/local/bin/terragrunt
 
-      # Destroy GKE cluster resources
-      - name: Terragrunt Destroy GKE cluster
-        run: terragrunt destroy --auto-approve --non-interactive --working-dir=live/dev/gke-cluster
+     # Destroy GKE cluster resources
+   #   - name: Terragrunt Destroy GKE cluster
+  #      run: terragrunt destroy --auto-approve --non-interactive --working-dir=live/dev/gke-cluster
 
-      # Wait for GKE cluster deletion
-      - name: Wait for GKE cluster deletion
-        run: |
-          RETRIES=20
-          while gcloud container clusters describe gke-cluster --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT &> /dev/null; do
-            echo "Waiting for GKE cluster to be deleted..."
-            sleep 15
-            RETRIES=$((RETRIES-1))
-            if [ $RETRIES -eq 0 ]; then
-              echo "GKE cluster deletion timeout"
-              exit 1
-            fi
-          done
+   #   # Wait for GKE cluster deletion
+   #   - name: Wait for GKE cluster deletion
+     #   run: |
+    #      RETRIES=20
+    #      while gcloud container clusters describe gke-cluster --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT &> /dev/null; do
+     #       echo "Waiting for GKE cluster to be deleted..."
+       #     sleep 15
+      #      RETRIES=$((RETRIES-1))
+     #       if [ $RETRIES -eq 0 ]; then
+     #         echo "GKE cluster deletion timeout"
+     #         exit 1
+     #       fi
+     #     done
 
       # Destroy firewall resources
       - name: Terragrunt Destroy Firewall
