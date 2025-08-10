@@ -1,8 +1,10 @@
 resource "google_container_cluster" "gke" {
   name     = var.cluster_name
   location = var.region
-  network  = var.network_self_link
-  subnetwork = var.subnet_self_link
+
+  # Just the names instead of full URLs
+  network    = var.network_name
+  subnetwork = var.subnet_name
 
   remove_default_node_pool = true
   initial_node_count       = 1
@@ -17,9 +19,9 @@ resource "google_container_cluster" "gke" {
 }
 
 resource "google_container_node_pool" "primary_nodes" {
-  name       = "${var.cluster_name}-pool"
-  location   = var.region
-  cluster    = google_container_cluster.gke.name
+  name     = "${var.cluster_name}-pool"
+  location = var.region
+  cluster  = google_container_cluster.gke.name
 
   node_config {
     machine_type = var.node_machine_type
