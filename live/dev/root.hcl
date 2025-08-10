@@ -4,7 +4,6 @@ locals {
   network_name = "dev-vpc"
   subnet_name  = "dev-subnet"
   subnet_cidr  = "10.0.0.0/24"
-  cluster_name = "powerh"
 }
 
 inputs = {
@@ -13,7 +12,6 @@ inputs = {
   subnet_name  = local.subnet_name
   subnet_cidr  = local.subnet_cidr
   region       = local.region
-  cluster_name = local.cluster_name
 }
 
 remote_state {
