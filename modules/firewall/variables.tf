@@ -1,16 +1,14 @@
-variable "network_name" {
-  description = "Name of the network where firewall rules will be applied."
+variable "project_id" {
+  description = "GCP project ID"
   type        = string
 }
 
-variable "firewall_rules" {
-  description = "List of firewall rules."
-  type = list(object({
-    name          = string
-    direction     = string
-    protocol      = string
-    ports         = list(string)
-    source_ranges = list(string)
-    target_tags   = list(string)
-  }))
+variable "network" {
+  description = "VPC network name"
+  type        = string
+}
+
+variable "subnet" {
+  description = "Subnet name"
+  type        = string
 }
