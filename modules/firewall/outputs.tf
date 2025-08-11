@@ -1,6 +1,4 @@
-output "firewall_names" {
-  value = [
-    google_compute_firewall.allow_internal.name,
-    google_compute_firewall.allow_ssh.name
-  ]
+output "firewall_rule_names" {
+  description = "Names of the created firewall rules."
+  value       = [for rule in google_compute_firewall.gke_firewall : rule.name]
 }
