@@ -1,22 +1,15 @@
-resource "google_compute_firewall" "allow_internal" {
-  name    = "${var.network_name}-allow-internal"
-  network = var.network_name  # just the name, e.g. "my-vpc"
+resource "google_compute_firewall" "gke_firewall" {
+  for_each = { for rule in var.firewall_rules : rule.name => rule }
+
+  name    = each.value.name
+  network = var.network_name
 
   allow {
-    protocol = "all"
+    protocol = each.value.protocol
+    ports    = each.value.ports
   }
 
-  source_ranges = ["10.0.0.0/8"]
-}
-
-resource "google_compute_firewall" "allow_ssh" {
-  name    = "${var.network_name}-allow-ssh"
-  network = var.network_name  # just the name
-
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-
-  source_ranges = ["0.0.0.0/0"]
+  direction     = each.value.direction
+  source_ranges = each.value.source_ranges
+  target_tags   = each.value.target_tags
 }
