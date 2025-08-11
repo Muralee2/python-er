@@ -1,6 +1,6 @@
 locals {
   project_id   = "silver-tape-467818-r9"
-  region       = "us-central1"
+  region       = "us-east1"
   network_name = "dev-vpc7"
   subnet_name  = "dev-subnet8"
   subnet_cidr  = "10.0.0.0/23"
