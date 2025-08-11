@@ -69,4 +69,4 @@ jobs:
         run: terragrunt init --non-interactive --working-dir=live/dev/gke-cluster
 
       - name: Terragrunt Apply gke-cluster
-        run: terragrunt apply --auto-approve --non-interactive --working-dir=live/dev/gke-clusterractive --working-dir=live/dev/gke-cluster
+        run: terragrunt apply --auto-approve --non-interactive --working-dir=live/dev/gke-cluster
