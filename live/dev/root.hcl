@@ -19,7 +19,7 @@ inputs = {
 remote_state {
   backend = "gcs"
   config = {
-    bucket   = "firestrom1"
+    bucket   = "firestormiscoming"
     prefix   = "${path_relative_to_include()}"
     project  = local.project_id
     location = "US"
