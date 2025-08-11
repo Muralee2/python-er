@@ -1,5 +1,5 @@
 locals {
-  project_id   = "able-armor-468408-v6"
+  project_id   = "silver-tape-467818-r9"
   region       = "us-central1"
   network_name = "dev-vpc7"
   subnet_name  = "dev-subnet8"
