@@ -52,21 +52,33 @@ jobs:
       - name: Wait after Firewall creation
         run: sleep 30
 
+      - name: Get subnet name from Terragrunt output
+        id: subnetname
+        run: |
+          SUBNET_NAME=$(terragrunt output -raw subnet_name --terragrunt-working-dir=live/dev/network)
+          echo "Subnet name is $SUBNET_NAME"
+          echo "::set-output name=subnet::$SUBNET_NAME"
+
+      - name: Debug - list all subnets before wait
+        run: gcloud compute networks subnets list --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT
+
       - name: Wait for subnet to be ready
         run: |
-         RETRIES=10
-         while ! gcloud compute networks subnets describe dev-subnet --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT &> /dev/null; do
-         echo "Waiting for subnet to be ready..."
-         sleep 15
-         RETRIES=$((RETRIES-1))
-         if [ $RETRIES -eq 0 ]; then
-         echo "Subnet not ready after waiting"
-         exit 1
-         fi
-         done
+          SUBNET=${{ steps.subnetname.outputs.subnet }}
+          RETRIES=20
+          while ! gcloud compute networks subnets describe "$SUBNET" --region=$GOOGLE_REGION --project=$GOOGLE_PROJECT &> /dev/null; do
+            echo "Waiting for subnet $SUBNET to be ready..."
+            sleep 15
+            RETRIES=$((RETRIES-1))
+            if [ $RETRIES -eq 0 ]; then
+              echo "Subnet $SUBNET not ready after waiting"
+              exit 1
+            fi
+          done
+          echo "Subnet $SUBNET is ready."
 
-      - name: Terragrunt Init gke-cluster
+      - name: Terragrunt Init - GKE Cluster
         run: terragrunt init --non-interactive --working-dir=live/dev/gke-cluster
 
-      - name: Terragrunt Apply gke-cluster
+      - name: Terragrunt Apply - GKE Cluster
         run: terragrunt apply --auto-approve --non-interactive --working-dir=live/dev/gke-cluster
