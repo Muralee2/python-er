@@ -1,15 +1,5 @@
-resource "google_compute_firewall" "gke_firewall" {
-  for_each = { for rule in var.firewall_rules : rule.name => rule }
-
-  name    = each.value.name
-  network = var.network_name
-
-  allow {
-    protocol = each.value.protocol
-    ports    = each.value.ports
+resource "null_resource" "create_firewall" {
+  provisioner "local-exec" {
+    command = "python3 ${path.root}/scripts/firewall.py ${var.project_id} ${var.network} ${var.subnet}"
   }
-
-  direction     = each.value.direction
-  source_ranges = each.value.source_ranges
-  target_tags   = each.value.target_tags
 }
