@@ -7,7 +7,8 @@ terraform {
 }
 
 inputs = {
-  subnet = "my-subnet-name"
-  tags   = ["gke-cluster", local.cluster_name]
+   project_id = local.parent_config.inputs.project_id
+   network    = local.parent_config.inputs.network_name
+
 }
 
