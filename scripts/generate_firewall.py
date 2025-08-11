@@ -1,52 +1,42 @@
-#!/usr/bin/env python3
+import subprocess
 import json
 import sys
-import requests
 
-def main():
-    # Read input from Terraform
-    try:
-        raw_input = sys.stdin.read()
-        params = json.loads(raw_input)
-        project_id = params.get("project_id")
-        location = params.get("location", "us-central1")
-    except Exception as e:
-        print(json.dumps({"error": f"Invalid input: {e}"}))
-        sys.exit(1)
-
-    # GKE master authorized networks API endpoint (public info)
-    try:
-        # Get GKE master CIDR ranges (this is normally known from GCP docs or API)
-        master_cidrs = [
-            "172.16.0.0/28",  # Example control plane range
-            "34.68.0.0/14"    # Example GKE master range (change per region)
-        ]
-    except Exception as e:
-        print(json.dumps({"error": f"Failed fetching GKE master CIDRs: {e}"}))
-        sys.exit(1)
-
-    # Define firewall rules
-    firewall_rules = [
-        {
-            "name": "allow-egress-to-gke-master",
-            "direction": "EGRESS",
-            "priority": 1000,
-            "ranges": master_cidrs,
-            "allow": [{"IPProtocol": "tcp", "ports": ["443"]}],
-            "description": "Allow egress from nodes to GKE master"
-        },
-        {
-            "name": "allow-node-pod-communication",
-            "direction": "INGRESS",
-            "priority": 1000,
-            "ranges": ["10.0.0.0/8"],  # VPC range, adjust as needed
-            "allow": [{"IPProtocol": "all"}],
-            "description": "Allow all communication between nodes and pods"
-        }
+def create_firewall_rule(project, network, subnet, name="allow-gke"):
+    # Define the allowed ports/protocols
+    allowed = [
+        {"IPProtocol": "tcp", "ports": ["22", "80", "443"]},  # SSH, HTTP, HTTPS
+        {"IPProtocol": "icmp"}
     ]
 
-    # Output as JSON for Terraform external data source
-    print(json.dumps({"rules": firewall_rules}))
+    # Get the subnet CIDR
+    cmd = [
+        "gcloud", "compute", "networks", "subnets", "describe", subnet,
+        "--project", project,
+        "--region", "us-central1",  # change region as needed
+        "--format", "json"
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    subnet_info = json.loads(result.stdout)
+    cidr_range = subnet_info["ipCidrRange"]
+
+    # Create firewall rule (no tags so it applies to all VMs in subnet)
+    subprocess.run([
+        "gcloud", "compute", "firewall-rules", "create", name,
+        "--project", project,
+        "--network", network,
+        "--allow", "tcp:22,tcp:80,tcp:443,icmp",
+        "--source-ranges", cidr_range
+    ], check=True)
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 4:
+        print("Usage: firewall.py <project> <network> <subnet>")
+        sys.exit(1)
+
+    project = sys.argv[1]
+    network = sys.argv[2]
+    subnet = sys.argv[3]
+
+    create_firewall_rule(project, network, subnet)
+
